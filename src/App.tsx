@@ -3,8 +3,7 @@ import { TodoList } from './TodoList';
 import { TodoForm } from './TodoForm';
 import { FilterBar } from './FilterBar';
 import { useTodos } from './hooks/useTodos';
-import type { Filter } from './models/Todo';
-
+import type { Filter } from './models/types';
 
 function App() {
   // states and hooks
@@ -29,7 +28,6 @@ function App() {
       <TodoList todos={filteredTodos} onToggleTodo={toggleTodo} onDeleteTodo={deleteTodo} onEditTodo={editTodo} />
       <TodoForm onAddTodo={addTodo}></TodoForm>
       <button onClick={clearCompleted}> clear completed</button>
-
     </div>
   );
 }

@@ -1,7 +1,8 @@
-import { useState } from "react";
-import type { Todo } from "./models/Todo";
 
+import type { Todo } from "./models/types";
+import { TodoItem } from "./TodoItem";
 
+// props for the TodoList component
 type TodoListProps = {
   todos: Todo[];
   onToggleTodo: (id: string) => void;
@@ -9,69 +10,29 @@ type TodoListProps = {
   onEditTodo: (id: string, newTitle: string) => void;
 };
 
+// component to render the list of todos
 export function TodoList({
   todos,
   onToggleTodo,
   onDeleteTodo,
   onEditTodo,
 }: TodoListProps) {
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [editingTitle, setEditingTitle] = useState<string>("");
-
   if (todos.length === 0) {
     return <p>No todos yet. Add your first one!</p>;
   }
 
+  // render the list of todos
   return (
     <ul style={{ listStyle: "none", paddingLeft: 0 }}>
-      {todos.map((todo) => {
-        const isEditing = editingId === todo.id;
-
-        return isEditing ? (
-          <li key={todo.id}>
-            <input
-              value={editingTitle}
-              onChange={(e) => setEditingTitle(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  onEditTodo(todo.id, editingTitle.trim());
-                  setEditingId(null);
-                }
-              }}
-            />
-            <button
-              onClick={() => {
-                onEditTodo(todo.id, editingTitle.trim());
-                setEditingId(null);
-              }}
-            >
-              Save
-            </button>
-            <button onClick={() => setEditingId(null)}>Cancel</button>
-          </li>
-        ) :
-          (
-            <li key={todo.id}>
-              <label>
-                <input
-                  type="checkbox"
-                  checked={todo.completed}
-                  onChange={() => onToggleTodo(todo.id)}
-                />
-                {todo.title}
-              </label>
-              <button
-                onClick={() => {
-                  setEditingId(todo.id);
-                  setEditingTitle(todo.title);
-                }}
-              >
-                Edit
-              </button>
-              <button onClick={() => onDeleteTodo(todo.id)}>Delete</button>
-            </li>
-          );
-      })}
+      {todos.map((todo) => (
+        <TodoItem
+          key={todo.id}
+          todo={todo}
+          onToggle={onToggleTodo}
+          onDelete={onDeleteTodo}
+          onEdit={onEditTodo}
+        />
+      ))}
     </ul>
   );
 }

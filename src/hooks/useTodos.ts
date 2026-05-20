@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
-import type { Todo } from "../models/Todo";
+import type { Todo } from "../models/types";
 
+// custom hook to manage the todos
 export function useTodos() {
+  // state to store the todos
   const [todos, setTodos] = useState<Todo[]>(() => {
     // get the todos from the local storage
     const stored = localStorage.getItem("todos");
@@ -36,7 +38,7 @@ export function useTodos() {
   // add a todo to the list
   function addTodo(title: string): void {
     const newTodo: Todo = {
-      id: crypto.randomUUID(), // or Date.now().toString()
+      id: crypto.randomUUID(),
       title,
       completed: false,
       createdAt: new Date(),
@@ -45,6 +47,7 @@ export function useTodos() {
     setTodos((prevTodos) => [...prevTodos, newTodo]);
   }
 
+  // change a todo's completion status
   function toggleTodo(id: string): void {
     setTodos((prevTodos) =>
       prevTodos.map((todo) =>
@@ -55,13 +58,14 @@ export function useTodos() {
     );
   }
 
+  // delete a todo from the list
   function deleteTodo(id: string): void {
     setTodos((prevTodos) =>
       prevTodos.filter((todo) => todo.id !== id)
     );
   }
 
-
+  // edit a todo's title
   function editTodo(id: string, newTitle: string): void {
     setTodos((prevTodos) =>
       prevTodos.map((todo) =>
@@ -72,6 +76,7 @@ export function useTodos() {
     );
   }
 
+  // clear all completed todos
   function clearCompleted(): void {
     setTodos((prevTodos) =>
       prevTodos.filter((todo) => !todo.completed)
