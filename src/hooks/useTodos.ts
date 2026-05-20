@@ -1,62 +1,90 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { Todo } from "../models/Todo";
 
 export function useTodos() {
+  const [todos, setTodos] = useState<Todo[]>(() => {
+    // get the todos from the local storage
+    const stored = localStorage.getItem("todos");
+    if (!stored) return [];
 
-const [todos, setTodos] = useState<Todo[]>([]);
+    try {
+      const parsed = JSON.parse(stored) as Array<{
+        id: string;
+        title: string;
+        completed: boolean;
+        createdAt: string;
+      }>;
 
+      return parsed.map((t) => ({
+        ...t,
+        createdAt: new Date(t.createdAt),
+      }));
+    } catch {
+      return [];
+    }
+  });
 
-function addTodo(title: string): void {
-  const newTodo: Todo = {
-    id: crypto.randomUUID(), // or Date.now().toString()
-    title,
-    completed: false,
-    createdAt: new Date(),
-  };
+  // save the todos to the local storage
+  useEffect(() => {
+    const serializable = todos.map((t) => ({
+      ...t,
+      createdAt: t.createdAt.toISOString(),
+    }));
+    localStorage.setItem("todos", JSON.stringify(serializable));
+  }, [todos]);
 
-  setTodos((prevTodos) => [...prevTodos, newTodo]);
-}
+  // add a todo to the list
+  function addTodo(title: string): void {
+    const newTodo: Todo = {
+      id: crypto.randomUUID(), // or Date.now().toString()
+      title,
+      completed: false,
+      createdAt: new Date(),
+    };
 
-function toggleTodo(id: string): void {
-  setTodos((prevTodos) =>
-    prevTodos.map((todo) =>
-      todo.id === id
-        ? { ...todo, completed: !todo.completed }
-        : todo
-    )
-  );
-}
+    setTodos((prevTodos) => [...prevTodos, newTodo]);
+  }
 
-function deleteTodo(id: string): void {
-  setTodos((prevTodos) =>
-    prevTodos.filter((todo) => todo.id !== id)
-  );
-}
+  function toggleTodo(id: string): void {
+    setTodos((prevTodos) =>
+      prevTodos.map((todo) =>
+        todo.id === id
+          ? { ...todo, completed: !todo.completed }
+          : todo
+      )
+    );
+  }
+
+  function deleteTodo(id: string): void {
+    setTodos((prevTodos) =>
+      prevTodos.filter((todo) => todo.id !== id)
+    );
+  }
 
 
   function editTodo(id: string, newTitle: string): void {
-  setTodos((prevTodos) =>
-    prevTodos.map((todo) =>
-      todo.id === id
-        ? { ...todo, title: newTitle }
-        : todo
-    )
-  );
-}
+    setTodos((prevTodos) =>
+      prevTodos.map((todo) =>
+        todo.id === id
+          ? { ...todo, title: newTitle }
+          : todo
+      )
+    );
+  }
 
-function clearCompleted(): void {
-  setTodos((prevTodos) =>
-    prevTodos.filter((todo) => !todo.completed)
-  );
-}
+  function clearCompleted(): void {
+    setTodos((prevTodos) =>
+      prevTodos.filter((todo) => !todo.completed)
+    );
+  }
 
   return {
     todos,
     addTodo,
     toggleTodo,
     deleteTodo,
-      editTodo,
-      clearCompleted,
+    editTodo,
+    clearCompleted,
   };
 
 }

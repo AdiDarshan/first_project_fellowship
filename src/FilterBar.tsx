@@ -1,5 +1,5 @@
-type Filter = "all" | "active" | "completed";
-
+import type { Filter } from "./models/Todo";
+      
 type FilterBarProps = {
   filter: Filter;
   onChangeFilter: (nextFilter: Filter) => void;
